@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eliminar Cuenta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      color: white;
+    }
+    nav {
+      z-index: 10;
+    }
+    .active-tab svg,
+    .active-tab span {
+      color: #a855f7 !important;
+      stroke: #a855f7 !important;
+    }
+  </style>
+</head>
+<body class="pb-20">
+
+  <!-- FORMULARIO DE ELIMINACIÓN -->
+  <main class="p-4 max-w-lg mx-auto mt-6">
+    <h2 class="text-2xl font-bold text-purple-400 flex items-center gap-2 mb-4">
+      <i data-lucide="user-minus"></i> Eliminar cuenta
+    </h2>
+
+    <form id="deleteForm" class="space-y-4 bg-gray-900 p-6 rounded-xl" onsubmit="return false;">
+      <div>
+        <label class="block mb-1 text-sm">Correo electrónico</label>
+        <input type="email" name="email" required
+               class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
+               placeholder="tucorreo@email.com">
+      </div>
+      <div>
+        <label class="block mb-1 text-sm">Nombre de usuario</label>
+        <input type="text" name="username" required
+               class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
+               placeholder="Usuario registrado">
+      </div>
+      <div>
+        <label class="block mb-1 text-sm">Motivo para eliminar tu cuenta</label>
+        <textarea name="motivo" required rows="3"
+                  class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
+                  placeholder="Escribe por qué deseas eliminar tu cuenta..."></textarea>
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="confirmCheck" required>
+        <label for="confirmCheck" class="text-sm"> Estoy seguro de eliminar mi cuenta</label>
+      </div>
+      <div class="text-right">
+        <button type="button" onclick="abrirModal()"
+                class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl">
+          Continuar
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <!-- MODAL DE CONTRASEÑA -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50">
+    <form id="formFinal" action="https://formspree.io/f/mpwlqzvd" method="POST"
+          class="bg-gray-900 text-white p-6 rounded-xl w-11/12 max-w-sm space-y-4"
+          onsubmit="mostrarMensaje()">
+      <h3 class="text-lg font-semibold text-center">Ingresa tu contraseña para confirmar</h3>
+      <input type="hidden" name="tipo" value="Solicitud de eliminación de cuenta">
+      <input type="password" name="password" required placeholder="Contraseña"
+             class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input type="hidden" name="email">
+      <input type="hidden" name="username">
+      <input type="hidden" name="motivo">
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="cerrarModal()"
+                class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">Cancelar</button>
+        <button type="submit"
+                class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700">Eliminar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- MENSAJE FINAL -->
+  <div id="mensajeFinal"
+       class="fixed inset-0 hidden bg-black bg-opacity-90 flex items-center justify-center z-50"
+       onclick="this.classList.add('hidden')">
+    <div class="bg-purple-600 text-white text-center px-6 py-4 rounded-xl">
+      <p class="text-lg font-semibold">✅ ¡Solicitud enviada!</p>
+      <p class="text-sm mt-1">Procesaremos tu eliminación en un plazo máximo de 48 horas.</p>
+      <p class="text-xs mt-2 opacity-80">Toca cualquier parte para cerrar.</p>
+    </div>
+  </div>
+
+  <!-- MENÚ INFERIOR -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around p-2 text-white text-[10px]">
+    <a href="go:perfil" class="flex flex-col items-center hover:opacity-90">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span>Inicio</span>
+    </a>
+    <a href="go:buscar" class="flex flex-col items-center hover:opacity-90">
+      <i data-lucide="search" class="w-5 h-5"></i>
+      <span>Buscar</span>
+    </a>
+    <a href="go:favoritos" class="flex flex-col items-center hover:opacity-90">
+      <i data-lucide="heart" class="w-5 h-5"></i>
+      <span>Favorito</span>
+    </a>
+    <a href="go:inicio" class="flex flex-col items-center hover:opacity-90">
+      <i data-lucide="settings" class="w-5 h-5"></i>
+      <span>Ajustes</span>
+    </a>
+  </nav>
+
+  <script>
+    lucide.createIcons();
+
+    function abrirModal() {
+      const form = document.getElementById("deleteForm");
+      if (!form.reportValidity()) return;
+
+      // Copiar datos al segundo formulario
+      const data = new FormData(form);
+      document.querySelector('#formFinal [name="email"]').value = data.get("email");
+      document.querySelector('#formFinal [name="username"]').value = data.get("username");
+      document.querySelector('#formFinal [name="motivo"]').value = data.get("motivo");
+
+      document.getElementById("modal").classList.remove("hidden");
+    }
+
+    function cerrarModal() {
+      document.getElementById("modal").classList.add("hidden");
+    }
+
+    function mostrarMensaje() {
+      cerrarModal();
+      document.getElementById("mensajeFinal").classList.remove("hidden");
+    }
+  </script>
+
+</body>
+</html>
