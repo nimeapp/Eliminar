@@ -260,22 +260,25 @@
       form.reset();
       document.getElementById("deleteForm").reset();
 
-    } catch (error) {
+       } catch (error) {
       // Manejo personalizado según error Firebase
       let msg = "Error desconocido. Intenta de nuevo.";
       if (error.code) {
         switch (error.code) {
           case 'auth/user-not-found':
-            msg = "No se encontró ninguna cuenta con ese correo.";
+            msg = "Correo no registrado.";
             break;
           case 'auth/wrong-password':
-            msg = "La contraseña es incorrecta.";
+            msg = "Contraseña incorrecta.";
             break;
           case 'auth/invalid-email':
-            msg = "El correo electrónico no es válido.";
+            msg = "Correo no válido.";
+            break;
+          case 'auth/invalid-credential':
+            msg = "Credenciales inválidas. Verifica tus datos.";
             break;
           case 'auth/too-many-requests':
-            msg = "Demasiados intentos fallidos, intenta más tarde.";
+            msg = "Demasiados intentos fallidos. Intenta más tarde.";
             break;
           default:
             msg = error.message || msg;
@@ -285,6 +288,7 @@
       }
       mostrarMensaje(msg);
     }
+
   });
 
   // Inicializar iconos lucide
