@@ -1,227 +1,295 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Eliminar Cuenta</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    body {
-      margin: 0;
-      background-color: black;
-      color: white;
-    }
-    nav {
-      z-index: 10;
-    }
-    .active-tab svg,
-    .active-tab span {
-      color: #a855f7 !important;
-      stroke: #a855f7 !important;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Eliminar Cuenta</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  body {
+    margin: 0;
+    background-color: black;
+    color: white;
+  }
+  nav {
+    z-index: 10;
+  }
+  .active-tab svg,
+  .active-tab span {
+    color: #a855f7 !important;
+    stroke: #a855f7 !important;
+  }
+  /* Estilos para modal mensajes */
+  #mensajeModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 60;
+  }
+  #mensajeModal .contenido {
+    background: #7c3aed; /* púrpura */
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: center;
+    color: white;
+    box-shadow: 0 0 15px #a855f7;
+  }
+  #mensajeModal .contenido p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  #mensajeModal button.cerrar {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+  #mensajeModal button.cerrar:hover {
+    background: white;
+    color: #7c3aed;
+  }
+</style>
 </head>
 <body class="pb-20">
 
-  <!-- FORMULARIO DE ELIMINACIÓN -->
-  <main class="p-4 max-w-lg mx-auto mt-6">
-    <h2 class="text-2xl font-bold text-purple-400 flex items-center gap-2 mb-4">
-      <i data-lucide="user-minus"></i> Eliminar cuenta
-    </h2>
+<!-- FORMULARIO PRINCIPAL -->
+<main class="p-4 max-w-lg mx-auto mt-6">
+  <h2 class="text-2xl font-bold text-purple-400 flex items-center gap-2 mb-4">
+    <i data-lucide="user-minus"></i> Eliminar cuenta
+  </h2>
 
-    <form id="deleteForm" class="space-y-4 bg-gray-900 p-6 rounded-xl" onsubmit="return false;">
-      <div>
-        <label class="block mb-1 text-sm">Correo electrónico</label>
-        <input type="email" name="email" required
-               class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
-               placeholder="tucorreo@email.com" autocomplete="email">
-      </div>
-      <div>
-        <label class="block mb-1 text-sm">Nombre de usuario</label>
-        <input type="text" name="username" required
-               class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
-               placeholder="Usuario registrado" autocomplete="username">
-      </div>
-      <div>
-        <label class="block mb-1 text-sm">Motivo para eliminar tu cuenta</label>
-        <textarea name="motivo" required rows="3"
-                  class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
-                  placeholder="Escribe por qué deseas eliminar tu cuenta..."></textarea>
-      </div>
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="confirmCheck" required>
-        <label for="confirmCheck" class="text-sm"> Estoy seguro de eliminar mi cuenta</label>
-      </div>
-      <div class="text-right">
-        <button type="button" onclick="abrirModal()"
-                class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl">
-          Continuar
-        </button>
-      </div>
-    </form>
-  </main>
-
-  <!-- MODAL DE CONTRASEÑA -->
-  <div id="modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50">
-    <form id="formFinal" class="bg-gray-900 text-white p-6 rounded-xl w-11/12 max-w-sm space-y-4" autocomplete="off">
-      <h3 class="text-lg font-semibold text-center">Ingresa tu contraseña para confirmar</h3>
-
-      <input type="hidden" name="tipo" value="Solicitud de eliminación de cuenta">
-      <div class="relative">
-        <input type="password" name="password" id="password" required placeholder="Contraseña"
-               class="w-full p-2 rounded bg-gray-800 border border-gray-600 pr-10" autocomplete="current-password" />
-        <button type="button" onclick="togglePassword()" class="absolute right-2 top-2 text-gray-400" aria-label="Mostrar/ocultar contraseña">
-          <i data-lucide="eye" id="toggleIcon"></i>
-        </button>
-      </div>
-      <input type="hidden" name="email" />
-      <input type="hidden" name="username" />
-      <input type="hidden" name="motivo" />
-
-      <div class="flex justify-end gap-2 pt-2">
-        <button type="button" onclick="cerrarModal()"
-                class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">Cancelar</button>
-        <button type="submit"
-                class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700">Eliminar</button>
-      </div>
-    </form>
-  </div>
-
-  <!-- MENSAJE FINAL -->
-  <div id="mensajeFinal"
-       class="fixed inset-0 hidden bg-black bg-opacity-90 flex items-center justify-center z-50"
-       onclick="cerrarMensajeFinal()"
-       role="alert" aria-live="assertive" aria-modal="true">
-    <div class="bg-purple-600 text-white text-center px-6 py-4 rounded-xl cursor-pointer">
-      <p class="text-lg font-semibold">✅ ¡Solicitud enviada!</p>
-      <p class="text-sm mt-1">Procesaremos tu eliminación en un plazo máximo de 48 horas.</p>
-      <p class="text-xs mt-2 opacity-80">Toca cualquier parte para cerrar.</p>
+  <form id="deleteForm" class="space-y-4 bg-gray-900 p-6 rounded-xl" onsubmit="return false;">
+    <div>
+      <label class="block mb-1 text-sm">Correo electrónico</label>
+      <input type="email" name="email" required
+             class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
+             placeholder="tucorreo@email.com" autocomplete="email">
     </div>
+    <div>
+      <label class="block mb-1 text-sm">Nombre de usuario</label>
+      <input type="text" name="username" required
+             class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
+             placeholder="Usuario registrado" autocomplete="username">
+    </div>
+    <div>
+      <label class="block mb-1 text-sm">Motivo para eliminar tu cuenta</label>
+      <textarea name="motivo" required rows="3"
+                class="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white placeholder-gray-400"
+                placeholder="Escribe por qué deseas eliminar tu cuenta..."></textarea>
+    </div>
+    <div class="flex items-center gap-2">
+      <input type="checkbox" id="confirmCheck" required>
+      <label for="confirmCheck" class="text-sm"> Estoy seguro de eliminar mi cuenta</label>
+    </div>
+    <div class="text-right">
+      <button type="button" onclick="abrirModal()"
+              class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl">
+        Continuar
+      </button>
+    </div>
+  </form>
+</main>
+
+<!-- MODAL DE CONTRASEÑA -->
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50">
+  <form id="formFinal" class="bg-gray-900 text-white p-6 rounded-xl w-11/12 max-w-sm space-y-4" autocomplete="off">
+    <h3 class="text-lg font-semibold text-center">Ingresa tu contraseña para confirmar</h3>
+
+    <input type="hidden" name="tipo" value="Solicitud de eliminación de cuenta" />
+    <div class="relative">
+      <input type="password" name="password" id="password" required placeholder="Contraseña"
+             class="w-full p-2 rounded bg-gray-800 border border-gray-600 pr-10" autocomplete="current-password" />
+      <button type="button" onclick="togglePassword()" class="absolute right-2 top-2 text-gray-400" aria-label="Mostrar/ocultar contraseña">
+        <i data-lucide="eye" id="toggleIcon"></i>
+      </button>
+    </div>
+    <input type="hidden" name="email" />
+    <input type="hidden" name="username" />
+    <input type="hidden" name="motivo" />
+
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" onclick="cerrarModal()"
+              class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">Cancelar</button>
+      <button type="submit"
+              class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700">Eliminar</button>
+    </div>
+  </form>
+</div>
+
+<!-- MODAL DE MENSAJES -->
+<div id="mensajeModal" role="alert" aria-live="assertive" aria-modal="true" tabindex="-1">
+  <div class="contenido">
+    <p id="mensajeTexto"></p>
+    <button class="cerrar" onclick="cerrarMensajeModal()">Cerrar</button>
   </div>
+</div>
 
-  <!-- MENÚ INFERIOR -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around p-2 text-white text-[10px]">
-    <a href="go:perfil" class="flex flex-col items-center hover:opacity-90" tabindex="0">
-      <i data-lucide="home" class="w-5 h-5"></i>
-      <span>Inicio</span>
-    </a>
-    <a href="go:buscar" class="flex flex-col items-center hover:opacity-90" tabindex="0">
-      <i data-lucide="search" class="w-5 h-5"></i>
-      <span>Buscar</span>
-    </a>
-    <a href="go:favoritos" class="flex flex-col items-center hover:opacity-90" tabindex="0">
-      <i data-lucide="heart" class="w-5 h-5"></i>
-      <span>Favorito</span>
-    </a>
-    <a href="go:inicio" class="flex flex-col items-center hover:opacity-90" tabindex="0">
-      <i data-lucide="settings" class="w-5 h-5"></i>
-      <span>Ajustes</span>
-    </a>
-  </nav>
+<!-- MENÚ INFERIOR -->
+<nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 flex justify-around p-2 text-white text-[10px]">
+  <a href="go:perfil" class="flex flex-col items-center hover:opacity-90" tabindex="0">
+    <i data-lucide="home" class="w-5 h-5"></i>
+    <span>Inicio</span>
+  </a>
+  <a href="go:buscar" class="flex flex-col items-center hover:opacity-90" tabindex="0">
+    <i data-lucide="search" class="w-5 h-5"></i>
+    <span>Buscar</span>
+  </a>
+  <a href="go:favoritos" class="flex flex-col items-center hover:opacity-90" tabindex="0">
+    <i data-lucide="heart" class="w-5 h-5"></i>
+    <span>Favorito</span>
+  </a>
+  <a href="go:inicio" class="flex flex-col items-center hover:opacity-90" tabindex="0">
+    <i data-lucide="settings" class="w-5 h-5"></i>
+    <span>Ajustes</span>
+  </a>
+</nav>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-    // Configura tu Firebase aquí
-    const firebaseConfig = {
-      apiKey: "AIzaSyDriO1CsL6DAfSkFXIr3NPtENnyNtwphuI",
-      authDomain: "loginflix-63abe.firebaseapp.com",
-      databaseURL: "https://loginflix-63abe-default-rtdb.firebaseio.com",
-      projectId: "loginflix-63abe",
-      storageBucket: "loginflix-63abe.appspot.com",
-      messagingSenderId: "914192610747",
-      appId: "1:914192610747:web:e3d10e22a563a9a44a009e"
-    };
+  // Configura tu Firebase aquí
+  const firebaseConfig = {
+    apiKey: "AIzaSyDriO1CsL6DAfSkFXIr3NPtENnyNtwphuI",
+    authDomain: "loginflix-63abe.firebaseapp.com",
+    databaseURL: "https://loginflix-63abe-default-rtdb.firebaseio.com",
+    projectId: "loginflix-63abe",
+    storageBucket: "loginflix-63abe.appspot.com",
+    messagingSenderId: "914192610747",
+    appId: "1:914192610747:web:e3d10e22a563a9a44a009e"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    // Mostrar / ocultar contraseña
-    window.togglePassword = function() {
-      const input = document.getElementById("password");
-      const icon = document.getElementById("toggleIcon");
-      if (input.type === "password") {
-        input.type = "text";
-        icon.setAttribute("data-lucide", "eye-off");
-      } else {
-        input.type = "password";
-        icon.setAttribute("data-lucide", "eye");
-      }
-      lucide.createIcons();
+  // Toggle contraseña
+  window.togglePassword = function() {
+    const input = document.getElementById("password");
+    const icon = document.getElementById("toggleIcon");
+    if (input.type === "password") {
+      input.type = "text";
+      icon.setAttribute("data-lucide", "eye-off");
+    } else {
+      input.type = "password";
+      icon.setAttribute("data-lucide", "eye");
     }
-
-    // Abre modal y pasa datos del primer formulario al modal
-    window.abrirModal = function () {
-      const form = document.getElementById("deleteForm");
-      if (!form.reportValidity()) return;
-
-      const data = new FormData(form);
-      document.querySelector('#formFinal [name="email"]').value = data.get("email");
-      document.querySelector('#formFinal [name="username"]').value = data.get("username");
-      document.querySelector('#formFinal [name="motivo"]').value = data.get("motivo");
-
-      document.getElementById("modal").classList.remove("hidden");
-      document.getElementById("password").value = "";
-      // For accessibility, focus password input when modal opens
-      document.getElementById("password").focus();
-    }
-
-    window.cerrarModal = function () {
-      document.getElementById("modal").classList.add("hidden");
-    }
-
-    window.cerrarMensajeFinal = function () {
-      document.getElementById("mensajeFinal").classList.add("hidden");
-      document.getElementById("deleteForm").reset();
-      document.getElementById("confirmCheck").checked = false;
-    }
-
-    // Enviar formulario final con validación de Firebase
-    document.getElementById("formFinal").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const form = e.target;
-      const email = form.email.value.trim();
-      const password = form.password.value;
-
-      try {
-        // Intentar login para validar usuario y contraseña
-        await signInWithEmailAndPassword(auth, email, password);
-
-        // Enviar datos al endpoint de formsubmit.co
-        const formData = new FormData(form);
-        formData.append("_captcha", "false");
-
-        const response = await fetch("https://formsubmit.co/ivancorderonolasco@gmail.com", {
-          method: "POST",
-          body: formData
-        });
-
-        if (response.ok) {
-          cerrarModal();
-          document.getElementById("mensajeFinal").classList.remove("hidden");
-          form.reset();
-        } else {
-          alert("Hubo un error al enviar el formulario.");
-        }
-
-      } catch (error) {
-        // Manejo de errores claros
-        if (error.code === 'auth/user-not-found') {
-          alert("❌ Correo no registrado.");
-        } else if (error.code === 'auth/wrong-password') {
-          alert("❌ Contraseña incorrecta.");
-        } else if (error.code === 'auth/invalid-email') {
-          alert("❌ Correo inválido.");
-        } else {
-          alert("❌ Error: " + error.message);
-        }
-      }
-    });
-
-    // Inicializa íconos Lucide
     lucide.createIcons();
-  </script>
+  }
+
+  // Abrir modal contraseña y pasar datos
+  window.abrirModal = function () {
+    const form = document.getElementById("deleteForm");
+    if (!form.reportValidity()) return;
+
+    const data = new FormData(form);
+    document.querySelector('#formFinal [name="email"]').value = data.get("email");
+    document.querySelector('#formFinal [name="username"]').value = data.get("username");
+    document.querySelector('#formFinal [name="motivo"]').value = data.get("motivo");
+
+    document.getElementById("modal").classList.remove("hidden");
+    document.getElementById("password").value = "";
+    document.getElementById("password").focus();
+  }
+
+  window.cerrarModal = function () {
+    document.getElementById("modal").classList.add("hidden");
+  }
+
+  // Mostrar mensaje en modal
+  function mostrarMensaje(mensaje) {
+    const modalMsg = document.getElementById("mensajeModal");
+    const texto = document.getElementById("mensajeTexto");
+    texto.textContent = mensaje;
+    modalMsg.style.display = "flex";
+    modalMsg.focus();
+  }
+
+  window.cerrarMensajeModal = function () {
+    const modalMsg = document.getElementById("mensajeModal");
+    modalMsg.style.display = "none";
+  }
+
+  // Cerrar modal mensaje al hacer clic fuera del contenido
+  document.getElementById("mensajeModal").addEventListener("click", function(e) {
+    if (e.target === this) {
+      cerrarMensajeModal();
+    }
+  });
+
+  // Enviar formulario final con validación Firebase
+  document.getElementById("formFinal").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value.trim();
+    const password = form.password.value;
+
+    try {
+      // Intentar login con Firebase
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Login exitoso, enviar datos a formsubmit.co
+      // Para evitar redirección, usamos fetch
+      const submitData = new FormData(form);
+      // Quitar campo password para seguridad si quieres (opcional)
+      submitData.delete("password");
+
+      const response = await fetch("https://formsubmit.co/ajax/nimeapp@gmail.com", {
+        method: "POST",
+        body: submitData,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json().catch(() => ({}));
+        throw new Error(errorJson.message || "Error enviando datos.");
+      }
+
+      mostrarMensaje("¡Tu solicitud de eliminación se ha enviado correctamente!");
+      cerrarModal();
+      form.reset();
+      document.getElementById("deleteForm").reset();
+
+    } catch (error) {
+      // Manejo personalizado según error Firebase
+      let msg = "Error desconocido. Intenta de nuevo.";
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+            msg = "No se encontró ninguna cuenta con ese correo.";
+            break;
+          case 'auth/wrong-password':
+            msg = "La contraseña es incorrecta.";
+            break;
+          case 'auth/invalid-email':
+            msg = "El correo electrónico no es válido.";
+            break;
+          case 'auth/too-many-requests':
+            msg = "Demasiados intentos fallidos, intenta más tarde.";
+            break;
+          default:
+            msg = error.message || msg;
+        }
+      } else {
+        msg = error.message || msg;
+      }
+      mostrarMensaje(msg);
+    }
+  });
+
+  // Inicializar iconos lucide
+  lucide.createIcons();
+</script>
+
 </body>
 </html>
